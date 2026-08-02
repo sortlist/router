@@ -68,7 +68,7 @@ pub use hive_router_internal::background_tasks;
 use hive_router_internal::background_tasks::{BackgroundTask, CancellationToken};
 use hive_router_internal::telemetry::{
     logging::{
-        request_id::WithRequestIdentifiers,
+        request_id::{RequestIdentifiers, WithRequestIdentifiers},
         summary::{self, WithRequestSummary},
         targets,
     },
@@ -184,6 +184,7 @@ async fn graphql_endpoint_handler(
             schema_state,
             app_state.clone(),
             parent_ctx,
+            &request_identifiers,
         )
         .await;
 
@@ -210,7 +211,7 @@ async fn graphql_endpoint_handler(
 
         (response_mode, inner_res, summary_guard)
     }
-    .with_request_id(request_identifiers)
+    .with_request_id(request_identifiers.clone())
     .with_request_summary()
     .await;
 
@@ -248,6 +249,7 @@ async fn graphql_endpoint_dispatch(
     schema_state: web::types::State<Arc<SchemaState>>,
     app_state: web::types::State<Arc<RouterSharedState>>,
     parent_ctx: opentelemetry::Context,
+    request_identifiers: &RequestIdentifiers,
 ) -> (ResponseMode, web::HttpResponse) {
     let root_http_request_span = HttpServerRequestSpan::from_request(
         request,
@@ -258,6 +260,7 @@ async fn graphql_endpoint_dispatch(
             .ip_header,
     );
     let _ = root_http_request_span.set_parent(parent_ctx);
+    root_http_request_span.record_request_id(request_identifiers.req_id());
 
     let response_header_sink = ResponseHeaderSink::default();
 
