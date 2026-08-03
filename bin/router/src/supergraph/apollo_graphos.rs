@@ -125,8 +125,8 @@ impl SupergraphApolloGraphOSLoader {
         let body = serde_json::json!({
             "query": UPLINK_QUERY,
             "variables": {
-                "apiKey": self.key,
-                "graphRef": self.graph_ref,
+                "apiKey": &self.key,
+                "graphRef": &self.graph_ref,
                 "ifAfterId": last_id,
             },
         });
