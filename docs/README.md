@@ -3270,7 +3270,7 @@ Loads a supergraph from Apollo GraphOS Uplink.
 |**graph\_ref**|`string`, `null`|The graph ref of the managed federation graph (`<GRAPH_ID>@<VARIANT>`).<br/><br/>Can also be set using the `APOLLO_GRAPH_REF` environment variable.<br/>|no|
 |**key**|`string`, `null`|The Apollo API key, with at least the `service:read` permission.<br/><br/>Can also be set using the `APOLLO_KEY` environment variable.<br/>|no|
 |**source**|`string`|Constant Value: `"apollo_graphos"`<br/>|yes|
-|**timeout**|`string`|The timeout for a single HTTP call to Apollo Uplink.<br/><br/>Can also be set using the `APOLLO_UPLINK_TIMEOUT` environment variable.<br/>Default: `"30s"`<br/>|no|
+|**timeout**|`string`|The timeout for a single HTTP call to Apollo Uplink.<br/>Default: `"30s"`<br/>|no|
 
 **Additional Properties:** not allowed   
 **Example**

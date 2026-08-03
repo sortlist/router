@@ -93,8 +93,6 @@ pub enum SupergraphSource {
         #[serde(default = "default_apollo_uplink_endpoints")]
         endpoint: SingleOrMultiple<String>,
         /// The timeout for a single HTTP call to Apollo Uplink.
-        ///
-        /// Can also be set using the `APOLLO_UPLINK_TIMEOUT` environment variable.
         #[serde(
             default = "default_apollo_uplink_timeout",
             deserialize_with = "humantime_serde::deserialize",
