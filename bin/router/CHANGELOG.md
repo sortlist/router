@@ -116,6 +116,73 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Other
 
 - *(deps)* update release-plz/action action to v0.5.113 ([#389](https://github.com/graphql-hive/router/pull/389))
+## 0.0.87 (2026-08-04)
+
+### Features
+
+#### Add `limits.max_request_header_size`
+
+Adds a new `limits.max_request_header_size` configuration option (default: `64KiB`) that rejects requests whose HTTP headers exceed the configured size with `431 Request Header Fields Too Large`, before the request is processed.
+
+Since the router propagates client headers (cookies, JWTs) to subgraphs, requests with oversized headers would previously be forwarded and rejected by the subgraph server's own header limit (e.g. Tomcat's 8KB default), surfacing as a confusing subgraph error. With this limit, such requests are rejected at the router with a clear error.
+
+### Fixes
+
+#### Expose request correlation IDs to plugins and middlewares
+
+Request/trace correlation IDs are now extracted and scoped by a dedicated middleware that wraps the entire request pipeline, instead of only inside the GraphQL handler. 
+
+This means plugins, the coprocessor runtime, and any other middleware can now log with the same `request_id`/`trace_id` as the rest of the request.
+
+Fixes https://github.com/graphql-hive/router/issues/1351
+
+#### Seed the embedded Hive Laboratory from the router config
+
+Adds optional keys under `laboratory`: `operations`, named operations that each open in a pre-filled tab, and `collections`, named groups of operations shown in the Laboratory's sidebar. Each operation may carry `variables`, `headers` and `extensions` as native YAML maps.
+
+Seeded values are embedded in the served page and visible via "view source", so they must not contain secrets. Seeded operations and collections are refreshed from config on every reload; work a user creates themselves is preserved.
+
+#### Upgrade to latest laboratory
+
+Upgrades the embedded [@graphql-hive/laboratory](https://github.com/graphql-hive/console/releases/tag/%40graphql-hive%2Flaboratory%400.2.3) from 0.2.0 to 0.2.3.
+
+**Added**
+
+-   Copy as cURL in the operation toolbar.
+-   A reload-schema button in the builder, which introspects over the network even when a schema was
+    supplied by the host, and spins while the request is in flight. It replaces the previous
+    "restore default endpoint" button; `restoreDefaultEndpoint` remains available on the API.
+-   `introspection.pollSchema` setting to turn off the 5 second introspection poll and refresh the
+    schema only on demand.
+-   `enableFullScreen` prop (default `true`) so hosts that already fill the viewport can hide the
+    full screen control.
+-   The Query Plan tab is now always shown, with an empty state explaining that plans appear when
+    the gateway returns `extensions.queryPlan`.
+
+**Fixed**
+
+-   The builder no longer collapses expanded fields while introspection is polling. An unchanged
+    schema previously produced a new `GraphQLSchema` on every poll, resetting expansion to the depth
+    of the current document.
+-   Editor hovers now appear on mouse over, so validation messages and schema documentation are
+    readable.
+-   Monaco's folding chevrons render as icons instead of empty squares. Font faces are now
+    registered on the document, where browsers resolve them, rather than inside the shadow root
+    where they are ignored.
+-   Response size is shown in real units instead of always reading `0KB`, and is measured in UTF-8
+    bytes.
+-   Tooltips attached with `asChild` now appear. `Button`, `TooltipTrigger` and `AlertDialogTrigger`
+    did not forward refs, leaving the tooltip without an element to anchor to.
+-   The builder's tree/list toggle is controlled, cannot be deselected into an empty state, and is
+    disabled with an explanation until a search is active.
+-   The Query Plan panel no longer throws while rendering when a response body is not JSON.
+-   monaco-graphql is initialized once and updated in place, so variables validation registers
+    regardless of which editor mounts first and survives an endpoint change.
+-   Removed invalid nested buttons in builder and collection rows, which also makes the collection
+    edit and delete actions keyboard reachable.
+-   The query plan visualization no longer updates state during render.
+-   The builder no longer resets its view when toggling settings, by hardening the merge code.
+
 ## 0.0.86 (2026-07-28)
 
 ### Fixes

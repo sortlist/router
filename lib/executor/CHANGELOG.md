@@ -94,6 +94,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Other
 
 - *(deps)* update release-plz/action action to v0.5.113 ([#389](https://github.com/graphql-hive/router/pull/389))
+## 7.0.2 (2026-08-04)
+
+### Fixes
+
+#### Add `limits.max_request_header_size`
+
+Adds a new `limits.max_request_header_size` configuration option (default: `64KiB`) that rejects requests whose HTTP headers exceed the configured size with `431 Request Header Fields Too Large`, before the request is processed.
+
+Since the router propagates client headers (cookies, JWTs) to subgraphs, requests with oversized headers would previously be forwarded and rejected by the subgraph server's own header limit (e.g. Tomcat's 8KB default), surfacing as a confusing subgraph error. With this limit, such requests are rejected at the router with a clear error.
+
+#### Seed the embedded Hive Laboratory from the router config
+
+Adds optional keys under `laboratory`: `operations`, named operations that each open in a pre-filled tab, and `collections`, named groups of operations shown in the Laboratory's sidebar. Each operation may carry `variables`, `headers` and `extensions` as native YAML maps.
+
+Seeded values are embedded in the served page and visible via "view source", so they must not contain secrets. Seeded operations and collections are refreshed from config on every reload; work a user creates themselves is preserved.
+
 ## 7.0.1 (2026-07-28)
 
 ### Fixes
